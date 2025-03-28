@@ -1,0 +1,34 @@
+# Smithery configuration file: https://smithery.ai/docs/config#smitheryyaml
+
+startCommand:
+  type: stdio
+  configSchema:
+    # JSON Schema defining the configuration options for the MCP.
+    type: object
+    properties:
+      userAgent:
+        type: string
+        default: ModelContextProtocol/1.0 (Autonomous;
+          +https://github.com/modelcontextprotocol/servers)
+        description: Custom user agent to use for web requests
+      ignoreRobotsTxt:
+        type: boolean
+        default: false
+        description: Whether to ignore robots.txt in web requests
+  exampleConfig:
+    userAgent: ModelContextProtocol/1.0 (Autonomous;
+      +https://github.com/modelcontextprotocol/servers)
+    ignoreRobotsTxt: false
+  commandFunction:
+    # A JS function that produces the CLI command based on the given config to start the MCP on stdio.
+    |-
+    (config) => {
+      const args = [];
+      if (config.ignoreRobotsTxt) {
+        args.push('--ignore-robots-txt');
+      }
+      if (config.userAgent && config.userAgent !== 'ModelContextProtocol/1.0 (Autonomous; +https://github.com/modelcontextprotocol/servers)') {
+        args.push(`--user-agent=${config.userAgent}`);
+      }
+      return { command: 'mcp-server-fetch', args };
+    }
